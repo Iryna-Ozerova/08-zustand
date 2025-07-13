@@ -1,6 +1,6 @@
 "use client"
 
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import type { NewNoteData } from "@/types/note"
 import { createNote } from "@/lib/api"
@@ -10,6 +10,7 @@ import css from "./NoteForm.module.css";
 
 
 export default function NoteForm() {
+  const queryClient = useQueryClient();
   const router = useRouter();
   const { draft, setDraft, clearDraft } = useNoteDraftStore();
 
@@ -18,7 +19,6 @@ export default function NoteForm() {
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >,
   ) => {
-	  // 4. Коли користувач змінює будь-яке поле форми — оновлюємо стан
     setDraft({
       ...draft,
       [event.target.name]: event.target.value,
@@ -29,18 +29,19 @@ export default function NoteForm() {
     mutationFn: createNote,
     onSuccess: () => {
       clearDraft();
+      queryClient.invalidateQueries({ queryKey: ['notes'] });
       router.push('/notes/filter/all');
     },
     });
 
-    const handleCancel = () => router.push('/notes/filter/all');
+    const handleCancel = () => router.back();
 
     const handleSubmit = (formData: FormData) => {
     const values: NewNoteData = {
     title: formData.get("title")?.toString() || "",
     content: formData.get("content")?.toString() || "",
     tag: formData.get("tag")?.toString() || "Todo",
-  }; // type NewNoteData видає помилку?
+  }; 
 
   mutate(values);
 };

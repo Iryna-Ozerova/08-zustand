@@ -1,6 +1,7 @@
-import NotesClient from "./Notes.client";
-import { fetchNotes } from "@/lib/api";
-import type { NotesResponse } from "@/types/note";
+import type { Metadata } from "next"
+import NotesClient from "./Notes.client"
+import { fetchNotes } from "@/lib/api"
+import type { NotesResponse } from "@/types/note"
 
 type Props = {
   params: Promise<{ slug?: string[] }>; 
@@ -32,7 +33,7 @@ export default async function NotesPage({ params }: Props) {
 }
 
 
-export async function generateMetadata({ params }: Props) {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { slug } = await params;
     const tag = slug?.[0] || "All";
 
